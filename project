@@ -1,0 +1,48 @@
+#weather.py 
+import requests 
+import os 
+from datetime import datetime 
+
+
+user_api = "66f0dfcc79bd4562813124400260307" #api key from weatherapi.com
+location = input("Enter the city name:")
+
+complete_api_link = f"https://api.weatherapi.com/v1/current.json?key={user_api}&q={location}&aqi=no"
+
+api_link = requests.get(complete_api_link)
+
+if api_link.status_code != 200:
+    print(api_link.status_code)
+    print(api_link.text)
+else:
+    api_data = api_link.json()
+
+    if api_data['current'] is None:
+        print("Invalid city: {}, please check your city name".format(location))
+
+    else:
+         #create variables to store and display data
+         temp_city = ((api_data['current']['temp_c']))
+         weather_desc = api_data['current']['condition']['text']
+         hmdt = api_data['current']['humidity']
+         wind_spd = api_data['current']['wind_kph']
+         date_time = datetime.now().strftime("%d %b %Y /%H:%M:%S")
+
+    print("--------------------------------------------------------------")
+    print("Weather Stats for - {} // {}".format(location.upper(), date_time))
+    print("--------------------------------------------------------------")
+
+    print("Current temperature is : {:.2f} deg C".format(temp_city))
+    print("Current weather desc :", weather_desc)
+    print("current Humidity   :", hmdt, '%')
+    print("current wind speed :", wind_spd, 'kmph')
+    
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Mittyverse AR VR Workshop</title>
+  <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+</head>
+
+<body>
+  <!-- SVG Color Blindness Filter Definitions -->
+  <svg class="svg-filter-defs" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="deuteranopia-matrix">
+        <feColorMatrix type="matrix"
+          values="0.625, 0.375, 0, 0, 0,  0.7, 0.3, 0, 0, 0,  0, 0.3, 0.7, 0, 0,  0, 0, 0, 1, 0" />
+      </filter>
+      <filter id="protanopia-matrix">
+        <feColorMatrix type="matrix"
+          values="0.567, 0.433, 0, 0, 0,  0.558, 0.442, 0, 0, 0,  0, 0.242, 0.758, 0, 0,  0, 0, 0, 1, 0" />
+      </filter>
+      <filter id="tritanopia-matrix">
+        <feColorMatrix type="matrix"
+          values="0.95, 0.05, 0, 0, 0,  0, 0.433, 0.567, 0, 0,  0, 0.475, 0.525, 0, 0,  0, 0, 0, 1, 0" />
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Ambient Glow Orbs -->
+  <div class="bg-glow-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Top Navigation Header -->
+    <header>
+      <div class="logo-container">
+        <div class="logo-icon" aria-hidden="true"></div>
+        <span class="logo-text">VIRTUAL<span>GATEWAY</span></span>
+      </div>
+      <div class="nav-controls">
+        <button class="btn" onclick="openPanel('settingsPanel')" id="settingsToggleBtn"
+          aria-label="Open Accessibility and System Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
+            </path>
+          </svg>
+          Settings
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Lobby / Dashboard View -->
+    <main class="lobby-view" id="lobbyView">
+      <section class="hero-section">
+        <h1>Democratizing World Exploration, <br /><span class="gradient-text">No Barriers.</span></h1>
+        <p>Step through our virtual portal to experience famous landmarks, astronomical observatories, and cultural
+          heritage sites. Designed with comfortable VR controls and deep sensory accessibility features.</p>
+      </section>
+
+      <!-- Category Filter Bar -->
+      <div class="filter-bar" role="tablist" aria-label="Filter destinations">
+        <button class="filter-btn active" role="tab" aria-selected="true" onclick="filterDestinations('all', this)">🌍
+          All Destinations</button>
+        <button class="filter-btn" role="tab" aria-selected="false" onclick="filterDestinations('historical', this)">🏛️
+          Historical Landmarks</button>
+        <button class="filter-btn" role="tab" aria-selected="false" onclick="filterDestinations('natural', this)">🏔️
+          Natural Wonders</button>
+        <button class="filter-btn" role="tab" aria-selected="false" onclick="filterDestinations('space', this)">🌌 Space
+          & Science</button>
+      </div>
+
+      <!-- Destination Cards Grid -->
+      <section class="destinations-grid" id="destinationsGrid" aria-label="Available virtual destinations">
+        <!-- Injected dynamically via app.js -->
+      </section>
+    </main>
+
+    <!-- Destination Detail Sliding Panel -->
+    <div class="panel-overlay" id="detailsPanel" role="dialog" aria-modal="true" aria-labelledby="detailsTitle"
+      onclick="closePanelOnOverlayClick(event, 'detailsPanel')">
+      <div class="sliding-panel">
+        <div class="panel-header">
+          <h2 id="detailsTitle">Destination Details</h2>
+          <button class="btn btn-icon-only" onclick="closePanel('detailsPanel')"
+            aria-label="Close details panel">✕</button>
+        </div>
+        <div class="panel-body" id="detailsPanelBody">
+          <!-- Injected dynamically via app.js -->
+        </div>
+        <div class="panel-footer">
+          <button class="btn btn-primary" onclick="closePanel('detailsPanel')">Back to Gallery</button>
+          <button class="btn btn-accent" id="startTourBtn" onclick="enterDestinationTour()">Start VR Experience</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accessibility Settings Drawer -->
+    <div class="panel-overlay" id="settingsPanel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle"
+      onclick="closePanelOnOverlayClick(event, 'settingsPanel')">
+      <div class="sliding-panel">
+        <div class="panel-header">
+          <h2 id="settingsTitle">Accessibility Settings</h2>
+          <button class="btn btn-icon-only" onclick="closePanel('settingsPanel')"
+            aria-label="Close settings panel">✕</button>
+        </div>
+        <div class="panel-body">
+
+          <!-- Audio Settings -->
+          <div class="settings-section">
+            <h3>Audio & Narration</h3>
+            <div class="control-item">
+              <div class="control-label">
+                <span class="control-title">Voice Descriptions (TTS)</span>
+                <span class="control-desc">Reads aloud destinations, landmarks, and details.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="settingTts" checked onchange="toggleTTS(this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="control-item">
+              <div class="control-label">
+                <span class="control-title">Narration Speed</span>
+                <span class="control-desc">Adjust speech talking rate.</span>
+              </div>
+              <select class="custom-select" id="settingSpeechRate" aria-label="Select Speech Rate"
+                onchange="changeSpeechRate(this.value)">
+                <option value="0.75">0.75x (Slower)</option>
+                <option value="1.0" selected>1.0x (Normal)</option>
+                <option value="1.25">1.25x (Faster)</option>
+                <option value="1.5">1.5x (Fast)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Movement Comfort Settings -->
+          <div class="settings-section">
+            <h3>Comfort & Locomotion</h3>
+            <div class="control-item">
+              <div class="control-label">
+                <span class="control-title">Locomotion Method</span>
+                <span class="control-desc">Use teleport waypoints for maximum comfort.</span>
+              </div>
+              <select class="custom-select" id="settingComfort" aria-label="Select Interaction Style"
+                onchange="changeComfortMode(this.value)">
+                <option value="teleport" selected>Comfort Waypoint Teleport</option>
+                <option value="gaze">Hands-Free Gaze Selection</option>
+              </select>
+            </div>
+            <div class="control-item">
+              <div class="control-label">
+                <span class="control-title">Seated Comfort Mode</span>
+                <span class="control-desc">Adjust camera height for seated exploration.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="settingSeated" onchange="toggleSeatedMode(this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Visual Settings -->
+          <div class="settings-section">
+            <h3>Visual Enhancements</h3>
+            <div class="control-item">
+              <div class="control-label">
+                <span class="control-title">High Contrast Mode</span>
+                <span class="control-desc">Yellow-on-black UI overlays for maximum legibility.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="settingHighContrast" onchange="toggleHighContrast(this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="control-item">
+              <div class="control-label">
+                <span class="control-title">Large Font Sizes</span>
+                <span class="control-desc">Increases interface reading visibility.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="settingLargeText" onchange="toggleLargeText(this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="control-item">
+              <div class="control-label">
+                <span class="control-title">Colorblind Color Filters</span>
+                <span class="control-desc">Adjust matrix for colorblind readability.</span>
+              </div>
+              <select class="custom-select" id="settingColorFilter" aria-label="Select Colorblind Filter"
+                onchange="changeColorFilter(this.value)">
+                <option value="none" selected>None</option>
+                <option value="grayscale">Grayscale</option>
+                <option value="deuteranopia">Deuteranopia (Red-Green)</option>
+                <option value="protanopia">Protanopia (Red-Green)</option>
+                <option value="tritanopia">Tritanopia (Blue-Yellow)</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+        <div class="panel-footer">
+          <button class="btn btn-primary" style="width:100%;" onclick="closePanel('settingsPanel')">Apply
+            Settings</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Tour View (WebXR Canvas Embed wrapper) -->
+    <div class="tour-view" id="tourView">
+
+      <!-- 2D Overlay HUD Control Panel (Shown on Desktop/Mobile fallback) -->
+      <div class="tour-overlay-hud" id="tourOverlayHud">
+        <div class="hud-header">
+          <div class="hud-title-container">
+            <span class="hud-title" id="hudDestTitle">Gateway Selection Lobby</span>
+            <span class="hud-subtitle" id="hudDestLoc">A-Frame Lobby</span>
+          </div>
+          <div class="hud-actions">
+            <button class="btn" onclick="openPanel('settingsPanel')" aria-label="Open settings overlay">⚙
+              Settings</button>
+            <button class="btn btn-primary" onclick="exitTour()" aria-label="Exit experience back to lobby">Exit
+              Tour</button>
+          </div>
+        </div>
+
+        <!-- Captions / Subtitles Overlay (for accessibility TTS read out) -->
+        <div class="hud-captions-container" id="hudCaptionsContainer" style="opacity: 1;">
+          <div class="caption-source" id="captionSource">System</div>
+          <p class="hud-captions-text" id="hudCaptionsText">Select a portal card in the environment or use the menu to
+            begin.</p>
+        </div>
+
+        <div class="hud-bottom-bar">
+          <!-- Time Travel Toggle (Shown only in appropriate historical scenes) -->
+          <div class="mode-toggle-pill" id="eraTogglePill" style="display: none;">
+            <button class="mode-pill-btn active" id="eraModernBtn" onclick="setEra('modern')">Modern Era</button>
+            <button class="mode-pill-btn" id="eraAncientBtn" onclick="setEra('ancient')">Ancient Era</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Embedded A-Frame Scene -->
+      <a-scene embedded vr-mode-ui="enterVRButton: true" cursor="rayOrigin: mouse">
+
+        <a-assets>
+          <!-- Material color definitions and procedural mixins -->
+        </a-assets>
+
+        <!-- 360 Sky Sphere -->
+        <a-sky id="sky" color="#030206"></a-sky>
+
+        <!-- Global Light Entities -->
+        <a-entity id="ambientLight" light="type: ambient; color: #3d3460; intensity: 0.8"></a-entity>
+        <a-entity id="directionalLight" light="type: directional; color: #ffffff; intensity: 0.6; castShadow: false"
+          position="5 15 5"></a-entity>
+
+        <!-- Dynamic Procedural Environment Elements Container -->
+        <a-entity id="proceduralEnvironment"></a-entity>
+
+        <!-- Dynamic Interactive POIs Container -->
+        <a-entity id="aframeHotspotsContainer"></a-entity>
+
+        <!-- Waypoint Teleport Navigation Points Container -->
+        <a-entity id="aframeWaypointsContainer"></a-entity>
+
+        <!-- Camera Rig & Controls Setup -->
+        <a-entity id="cameraRig" position="0 0 0" rotation="0 0 0">
+
+          <!-- Seated comfort Height shifts on `#camera` -->
+          <a-entity id="camera" camera look-controls="pointerLockEnabled: false" position="0 1.6 0">
+
+            <!-- Gaze fuse cursor integration (Only active in gaze mode) -->
+            <a-entity id="gazeCursor" position="0 0 -1"
+              geometry="primitive: ring; radiusInner: 0.01; radiusOuter: 0.018"
+              material="color: #00ffcc; shader: flat; opacity: 0.8" cursor="fuse: true; fuseTimeout: 1500"
+              raycaster="objects: .clickable" visible="false">
+            </a-entity>
+
+            <!-- 3D HUD Panel - Anchored in front of camera view but stays fixed in orientation for comfort -->
+            <a-entity id="vrHud" position="0 -0.4 -1.3" rotation="-15 0 0" scale="0.6 0.6 0.6">
+
+              <!-- HUD Panel Background -->
+              <a-plane id="vrHudBg" width="2" height="1" color="#110e20" opacity="0.85" transparent="true"
+                material="strokeColor: #783eff; strokeWidth: 2">
+              </a-plane>
+
+              <!-- HUD Title -->
+              <a-text id="vrHudTitle" value="Virtual Gateway Lobby" align="center" width="2.2" position="0 0.38 0.01"
+                color="#00ffcc" font="roboto"></a-text>
+
+              <!-- Exit Tour 3D VR Button -->
+              <a-entity class="clickable vr-hud-btn" id="vrHudLobbyBtn" position="-0.6 -0.15 0.02" vr-interactive
+                onclick="exitTour()">
+                <a-plane width="0.55" height="0.22" color="#ff0077" opacity="0.9"></a-plane>
+                <a-text value="Exit Tour" align="center" width="1.6" position="0 0 0.01" color="#ffffff"
+                  font="roboto"></a-text>
+              </a-entity>
+
+              <!-- Snap Turn Left VR Button -->
+              <a-entity class="clickable vr-hud-btn" id="vrHudSnapLeftBtn" position="-0.18 -0.15 0.02" vr-interactive
+                onclick="snapTurn(45)">
+                <a-plane width="0.22" height="0.22" color="#3d3460" opacity="0.9"></a-plane>
+                <a-text value="< Snap" align="center" width="1.6" position="0 0 0.01" color="#ffffff"
+                  font="roboto"></a-text>
+              </a-entity>
+
+              <!-- Snap Turn Right VR Button -->
+              <a-entity class="clickable vr-hud-btn" id="vrHudSnapRightBtn" position="0.18 -0.15 0.02" vr-interactive
+                onclick="snapTurn(-45)">
+                <a-plane width="0.22" height="0.22" color="#3d3460" opacity="0.9"></a-plane>
+                <a-text value="Snap >" align="center" width="1.6" position="0 0 0.01" color="#ffffff"
+                  font="roboto"></a-text>
+              </a-entity>
+
+              <!-- Height Toggle VR Button -->
+              <a-entity class="clickable vr-hud-btn" id="vrHudHeightBtn" position="0.6 -0.15 0.02" vr-interactive
+                onclick="toggleVRHeight()">
+                <a-plane width="0.55" height="0.22" color="#783eff" opacity="0.9"></a-plane>
+                <a-text id="vrHudHeightBtnText" value="Height: Std" align="center" width="1.5" position="0 0 0.01"
+                  color="#ffffff" font="roboto"></a-text>
+              </a-entity>
+
+              <!-- Era Switcher 3D Button (Only visible in Giza Pyramids) -->
+              <a-entity class="clickable vr-hud-btn" id="vrHudEraBtn" position="0 0.12 0.02" vr-interactive
+                onclick="toggleVREra()" visible="false">
+                <a-plane width="0.8" height="0.2" color="#00ffcc" opacity="0.9"></a-plane>
+                <a-text id="vrHudEraBtnText" value="Era: Modern" align="center" width="1.6" position="0 0 0.01"
+                  color="#110e20" font="roboto"></a-text>
+              </a-entity>
+
+              <!-- Accessibility Subtitles inside VR (Double sided for reading ease) -->
+              <a-plane width="1.9" height="0.24" color="#05030a" opacity="0.9" position="0 -0.42 0.01"></a-plane>
+              <a-text id="vrHudSubtitles" value="Welcome. Select a destination from the floating portals."
+                align="center" width="1.7" position="0 -0.42 0.02" color="#ffffff" font="roboto"></a-text>
+            </a-entity>
+
+          </a-entity>
+
+          <!-- Left Controller Laser Pointer support -->
+          <a-entity id="leftHand" laser-controls="hand: left" raycaster="objects: .clickable; far: 20"
+            line="color: #783eff; opacity: 0.6"></a-entity>
+          <!-- Right Controller Laser Pointer support -->
+          <a-entity id="rightHand" laser-controls="hand: right" raycaster="objects: .clickable; far: 20"
+            line="color: #783eff; opacity: 0.6"></a-entity>
+
+        </a-entity>
+
+      </a-scene>
+
+    </div>
+
+    <!-- Spinner Loading Overlay -->
+    <div class="loading-overlay" id="loadingScreen">
+      <div class="spinner-ring" aria-hidden="true"></div>
+      <p class="loading-text" id="loadingText">Aligning Virtual Gateway coordinates...</p>
+    </div>
+  </div>
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    // --- DESTINATION DATA SYSTEM ---
+    const destinations = [
+      {
+        id: "pyramids",
+        name: "Giza Pyramids",
+        location: "Giza, Egypt",
+        category: "historical",
+        icon: "🏛️",
+        tags: ["Historical Site", "Sunset View", "Ancient Egypt"],
+        shortDesc: "Experience the monumental Giza Pyramids and mystery of the Great Sphinx, with a full ancient restoration era switch.",
+        longDesc: "Visit the Pyramids of Giza, built during Egypt's Old Kingdom. Toggle between the modern weathered ruins and the ancient era, when the pyramids were covered in shining white limestone with solid golden capstones (pyramidions) set against the lush greenery of the Nile Valley.",
+        spawnPos: "0 0 5",
+        skyColorModern: "#ea8037",
+        skyColorAncient: "#6ac0e5",
+        lightIntensity: 0.8,
+        ambientFreq: 180, // Sound oscillator tone
+        pois: [
+          {
+            id: "khufu",
+            name: "Pyramid of Khufu",
+            description: "The Great Pyramid of Khufu is the oldest and largest of the three pyramids, built around 2560 BC. It originally stood 146 meters tall and was made of 2.3 million limestone blocks.",
+            pos: "0 4 -35",
+            radius: 1.5
+          },
+          {
+            id: "sphinx",
+            name: "The Great Sphinx",
+            description: "Carved directly from limestone bedrock, this monumental statue depicting a creature with a lion's body and a pharaoh's head is believed to represent Pharaoh Khafre.",
+            pos: "16 1.5 -8",
+            radius: 1.2
+          },
+          {
+            id: "nile",
+            name: "Nile Valley",
+            description: "In the Ancient Era, a branch of the Nile River ran close to the Pyramids, facilitating the transport of massive stone blocks from distant quarries.",
+            pos: "-18 1.2 -15",
+            radius: 1.2
+          }
+        ],
+        waypoints: [
+          { pos: "0 0 5" },
+          { pos: "12 0 -6" },
+          { pos: "-12 0 -12" },
+          { pos: "0 0 -22" }
+        ]
+      },
+      {
+        id: "mars",
+        name: "Cosmic Observatory",
+        location: "Mars Orbit",
+        category: "space",
+        icon: "🌌",
+        tags: ["Astronomy", "Mars", "Procedural Model"],
+        shortDesc: "Stargaze from the crimson surface of Mars inside a futuristic observation dome containing a holographic solar system model.",
+        longDesc: "Stand on Mars and look at a detailed holographic console of our solar system. The thin Martian atmosphere provides crystal-clear astronomical observation. Witness planetary scaling and orbits in a fully immersive 360-degree cosmic sanctuary.",
+        spawnPos: "0 0 2",
+        skyColorModern: "#030206",
+        skyColorAncient: "#030206",
+        lightIntensity: 0.5,
+        ambientFreq: 110,
+        pois: [
+          {
+            id: "hologram",
+            name: "Solar System Hologram",
+            description: "This real-time model represents the major planets. Hover over and watch their relative orbital rates around our Sun, simulating space physics.",
+            pos: "0 1.5 -3",
+            radius: 0.8
+          },
+          {
+            id: "rover",
+            name: "Curiosity Rover",
+            description: "Parked outside the dome is a reconstruction of NASA's Curiosity rover, exploring Gale Crater since 2012 to discover ancient microbial habitable environments.",
+            pos: "-8 0.8 -9",
+            radius: 1.2
+          },
+          {
+            id: "starmap",
+            name: "Deep Space Console",
+            description: "A terminal charting deep sky constellations visible from Mars. Because Mars lacks a dense atmosphere, stars do not twinkle and are intensely bright.",
+            pos: "3 1.2 -4",
+            radius: 1.0
+          }
+        ],
+        waypoints: [
+          { pos: "0 0 2" },
+          { pos: "0 0 -1.5" },
+          { pos: "6 0 -4" },
+          { pos: "-6 0 -7" }
+        ]
+      },
+      {
+        id: "fjord",
+        name: "Northern Lights Fjord",
+        location: "Tromsø, Norway",
+        category: "natural",
+        icon: "🏔️",
+        tags: ["Natural Wonder", "Aurora", "Winter Landscape"],
+        shortDesc: "Experience the glowing ribbons of the Aurora Borealis hovering over a quiet, snow-capped glacial fjord.",
+        longDesc: "Travel to Tromsø, Norway during the winter solstice. Standing by the edge of an ice-covered fjord, watch the green and purple light curtains of the Aurora Borealis wave across the sky, accompanied by ambient winter wind effects.",
+        spawnPos: "0 0 4",
+        skyColorModern: "#02040d",
+        skyColorAncient: "#02040d",
+        lightIntensity: 0.4,
+        ambientFreq: 130,
+        pois: [
+          {
+            id: "aurora",
+            name: "Aurora Borealis",
+            description: "Also known as the Northern Lights, this collision of solar wind charged particles with Earth's magnetic field excites gaseous atoms in the upper atmosphere, causing them to glow green and violet.",
+            pos: "0 15 -35",
+            radius: 2.0
+          },
+          {
+            id: "glacier",
+            name: "Fjord Formation",
+            description: "Fjords are deep, narrow valleys carved by moving glaciers during successive ice ages. When glaciers retreated, seawater filled the massive valley trenches.",
+            pos: "-12 1.5 -22",
+            radius: 1.5
+          },
+          {
+            id: "constellation",
+            name: "Polar Stargazing",
+            description: "Look straight up to observe polar constellations like the Big Dipper (Ursa Major) and Polaris, the North Star, which have guided explorers for centuries.",
+            pos: "5 20 5",
+            radius: 1.8
+          }
+        ],
+        waypoints: [
+          { pos: "0 0 4" },
+          { pos: "0 0 -10" },
+          { pos: "-8 0 -6" },
+          { pos: "8 1 -14" }
+        ]
+      },
+      {
+        id: "oceanic",
+        name: "Oceanic Biosphere",
+        location: "Mariana Trench",
+        category: "space",
+        icon: "🚀",
+        tags: ["Future Science", "Deep Ocean", "Bioluminescent Life"],
+        shortDesc: "Explore an underwater biosphere dome placed in the deep sea, surrounded by bioluminescent life and volcanic vents.",
+        longDesc: "Descend into the midnight zone of the ocean. Stand inside a pressure-resistant glass biosphere, watching bubbles rise, bioluminescent plants sway, and geothermal vents erupt with minerals, creating life without sunlight.",
+        spawnPos: "0 0 3",
+        skyColorModern: "#010814",
+        skyColorAncient: "#010814",
+        lightIntensity: 0.3,
+        ambientFreq: 80,
+        pois: [
+          {
+            id: "vent",
+            name: "Hydrothermal Vent",
+            description: "Known as black smokers, these cracks on the ocean floor discharge geothermally heated water rich in minerals, supporting unique ecosystems via chemosynthesis.",
+            pos: "10 2 -12",
+            radius: 1.5
+          },
+          {
+            id: "kelp",
+            name: "Bioluminescent Kelp",
+            description: "Engineered deep-sea flora glowing in neon greens and cyans, absorbing thermal heat and transforming it into cold organic light.",
+            pos: "-7 1.8 -8",
+            radius: 1.2
+          },
+          {
+            id: "sub",
+            name: "Exploring Submarine",
+            description: "A deep-submergence vehicle parked outside, engineered to withstand pressures over 1,000 atmospheres in the deep trenches.",
+            pos: "-1 1.2 -15",
+            radius: 1.2
+          }
+        ],
+        waypoints: [
+          { pos: "0 0 3" },
+          { pos: "0 0 -1" },
+          { pos: "-5 0 -4" },
+          { pos: "6 0 -8" }
+        ]
+      }
+    ];
+
+    // --- ACCESSIBILITY STATE MANAGEMENT ---
+    const appState = {
+      currentDest: null,
+      ttsEnabled: true,
+      speechRate: 1.0,
+      comfortMode: "teleport",
+      seatedMode: false,
+      highContrast: false,
+      largeText: false,
+      colorFilter: "none",
+      era: "modern"
+    };
+
+    // --- PROCEDURAL AUDIO SYNTHESIZER ENGINE ---
+    const AudioEngine = {
+      ctx: null,
+      ambientOsc: null,
+      ambientGain: null,
+
+      init() {
+        if (this.ctx) return;
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      },
+
+      playTone(freq, type, duration, volume = 0.1) {
+        this.init();
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+          gain.gain.setValueAtTime(volume, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch (e) {
+          console.warn("Web Audio API not allowed or failed:", e);
+        }
+      },
+
+      playClick() { this.playTone(600, 'sine', 0.1, 0.05); },
+      playTeleport() {
+        this.playTone(200, 'sawtooth', 0.08, 0.02);
+        setTimeout(() => this.playTone(500, 'sine', 0.3, 0.05), 80);
+      },
+      playSuccess() {
+        this.playTone(523.25, 'triangle', 0.15, 0.06); // C5
+        setTimeout(() => this.playTone(659.25, 'triangle', 0.25, 0.06), 120); // E5
+      },
+      playPoi() { this.playTone(440, 'triangle', 0.2, 0.05); },
+
+      startAmbientHum(freq) {
+        this.init();
+        this.stopAmbientHum();
+        try {
+          this.ambientOsc = this.ctx.createOscillator();
+          this.ambientGain = this.ctx.createGain();
+
+          this.ambientOsc.type = 'sine';
+          this.ambientOsc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+          this.ambientGain.gain.setValueAtTime(0.02, this.ctx.currentTime);
+
+          this.ambientOsc.connect(this.ambientGain);
+          this.ambientGain.connect(this.ctx.destination);
+
+          this.ambientOsc.start();
+        } catch (e) {
+          console.warn("Ambient hum failed:", e);
+        }
+      },
+
+      stopAmbientHum() {
+        if (this.ambientOsc) {
+          try {
+            this.ambientOsc.stop();
+          } catch (e) { }
+          this.ambientOsc = null;
+        }
+      }
+    };
+
+    // --- TEXT-TO-SPEECH (TTS) ENGINE ---
+    const NarrationEngine = {
+      speak(text, source = "Guide") {
+        showCaptions(source, text);
+
+        if (!appState.ttsEnabled) return;
+
+        // Cancel ongoing speech synthesis
+        window.speechSynthesis.cancel();
+
+        try {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.rate = appState.speechRate;
+
+          utterance.onstart = () => {
+            // Accent colors or visual highlights can go here
+          };
+
+          window.speechSynthesis.speak(utterance);
+        } catch (e) {
+          console.warn("Speech synthesis not supported in this browser:", e);
+        }
+      },
+
+      stop() {
+        window.speechSynthesis.cancel();
+      }
+    };
+
+    // Helper: Write Subtitles to HUD
+    function showCaptions(source, text) {
+      // 2D HUD Captions
+      const captionsText = document.getElementById('hudCaptionsText');
+      const captionsContainer = document.getElementById('hudCaptionsContainer');
+      const captionSource = document.getElementById('captionSource');
+
+      if (captionsText && captionSource) {
+        captionSource.textContent = source;
+        captionsText.textContent = text;
+        captionsContainer.style.opacity = '1';
+      }
+
+      // 3D VR HUD Subtitles
+      const vrSubtitles = document.getElementById('vrHudSubtitles');
+      if (vrSubtitles) {
+        // Truncate for 3D layout bounds if necessary
+        let cleanText = text;
+        if (cleanText.length > 85) {
+          cleanText = cleanText.substring(0, 82) + "...";
+        }
+        vrSubtitles.setAttribute('value', cleanText);
+      }
+    }
+
+    // --- A-FRAME REGISTER COMPONENT INTERACTION SCHEMES ---
+
+    // 1. billboard: Makes 3D panels face the player camera continuously
+    AFRAME.registerComponent('billboard', {
+      tick: function () {
+        const camera = this.el.sceneEl.camera;
+        if (!camera) return;
+        this.el.object3D.lookAt(camera.position);
+      }
+    });
+
+    // 2. pulse: Animates POI scales to catch eyes comfortably
+    AFRAME.registerComponent('pulse', {
+      schema: { speed: { type: 'number', default: 1200 }, min: { type: 'number', default: 0.85 }, max: { type: 'number', default: 1.15 } },
+      init: function () {
+        this.time = 0;
+      },
+      tick: function (time, timeDelta) {
+        this.time += timeDelta;
+        const cycle = (Math.sin(this.time / this.schema.speed) + 1) / 2; // 0 to 1
+        const scale = this.schema.min + cycle * (this.schema.max - this.schema.min);
+        this.el.setAttribute('scale', { x: scale, y: scale, z: scale });
+      }
+    });
+
+    // 3. vr-interactive: Trigger scaling and sound feedbacks on hover inside VR
+    AFRAME.registerComponent('vr-interactive', {
+      init: function () {
+        const el = this.el;
+        el.addEventListener('mouseenter', () => {
+          el.setAttribute('animation__hoverScale', {
+            property: 'scale',
+            to: (el.getAttribute('scale') ? el.getAttribute('scale').x * 1.1 : 1.1) + ' ' + (el.getAttribute('scale') ? el.getAttribute('scale').y * 1.1 : 1.1) + ' 1.1',
+            dur: 150
+          });
+          AudioEngine.playClick();
+        });
+        el.addEventListener('mouseleave', () => {
+          el.setAttribute('animation__hoverScale', {
+            property: 'scale',
+            to: (el.getAttribute('scale') ? el.getAttribute('scale').x / 1.1 : 1.0) + ' ' + (el.getAttribute('scale') ? el.getAttribute('scale').y / 1.1 : 1.0) + ' 1.0',
+            dur: 150
+          });
+        });
+      }
+    });
+
+    // --- INITIALIZATION ---
+    window.addEventListener('DOMContentLoaded', () => {
+      renderDestinationGrid();
+      // Ensure overlays close smoothly
+      document.addEventListener('keydown', (e) => {
+        if (e.key === "Escape") {
+          closePanel('settingsPanel');
+          closePanel('detailsPanel');
+        }
+      });
+    });
+
+    // --- RENDERING 2D DESKTOP GALLERY ---
+    function renderDestinationGrid(filter = "all") {
+      const grid = document.getElementById('destinationsGrid');
+      grid.innerHTML = '';
+
+      const filtered = destinations.filter(d => filter === "all" || d.category === filter);
+
+      filtered.forEach(dest => {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.setAttribute('role', 'listitem');
+
+        card.innerHTML = `
+          <div class="card-thumbnail thumb-${dest.id}" aria-hidden="true">
+            <span class="card-category">${dest.icon} ${dest.category.toUpperCase()}</span>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">${dest.name}</h3>
+            <div class="card-location">${dest.location}</div>
+            <p class="card-desc">${dest.shortDesc}</p>
+            <div class="card-footer">
+              <button class="btn" onclick="openDetails('${dest.id}')" aria-label="View details about ${dest.name}">Explore Details</button>
+              <button class="btn btn-accent" onclick="startDirectTour('${dest.id}')" aria-label="Enter VR scene for ${dest.name}">Enter VR Portal</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterDestinations(category, element) {
+      AudioEngine.playClick();
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      element.classList.add('active');
+      renderDestinationGrid(category);
+    }
+
+    // --- ACCESSIBILITY DIALOG DRAWERS ---
+    function openPanel(id) {
+      AudioEngine.playClick();
+      document.getElementById(id).classList.add('active');
+    }
+
+    function closePanel(id) {
+      AudioEngine.playClick();
+      document.getElementById(id).classList.remove('active');
+    }
+
+    function closePanelOnOverlayClick(event, id) {
+      if (event.target === document.getElementById(id)) {
+        closePanel(id);
+      }
+    }
+
+    // --- DESTINATION DETAIL PANEL VIEW ---
+    let activeDetailId = null;
+    function openDetails(id) {
+      activeDetailId = id;
+      const dest = destinations.find(d => d.id === id);
+      const body = document.getElementById('detailsPanelBody');
+
+      body.innerHTML = `
+        <div class="details-img-placeholder thumb-${dest.id}">
+          <span class="details-tag">${dest.icon} ${dest.name}</span>
+        </div>
+        <p class="details-desc">${dest.longDesc}</p>
+        
+        <div class="details-list">
+          <h4>📍 Interactive Points of Interest</h4>
+          <ul>
+            ${dest.pois.map(p => `<li><strong>${p.name}:</strong> ${p.description.substring(0, 70)}...</li>`).join('')}
+          </ul>
+        </div>
+
+        <div class="details-list">
+          <h4>🌟 Accessibility Comfort Ratings</h4>
+          <ul>
+            <li><strong>Locomotion:</strong> Seated Comfortable Waypoints (0% Motion Sickness)</li>
+            <li><strong>Audio Narration:</strong> Fully Voice Described (TTS) with text subtitles</li>
+            <li><strong>Visual Controls:</strong> High Contrast text matrices compatible</li>
+          </ul>
+        </div>
+
+        <div class="controls-help-box">
+          <p><strong>VR Controller Bindings (Meta Quest 3S):</strong></p>
+          <p>• Point with controller ray beam & squeeze Trigger to click waypoints/buttons.</p>
+          <p>• Squeeze Grip to toggle height (Seated Comfort Mode).</p>
+          <p>• Tilt Thumbstick Left/Right to Snap Turn 45 degrees.</p>
+          <p>• Look around naturally to explore.</p>
+        </div>
+      `;
+      openPanel('detailsPanel');
+
+      // Narrate opening details
+      NarrationEngine.speak(`${dest.name}, located in ${dest.location}. ${dest.shortDesc}`);
+    }
+
+    function startDirectTour(id) {
+      openDetails(id);
+      setTimeout(() => {
+        enterDestinationTour();
+      }, 500);
+    }
+
+    // --- ACCESSIBILITY PREFERENCES IMPLEMENTATION ---
+    function toggleTTS(enabled) {
+      appState.ttsEnabled = enabled;
+      AudioEngine.playClick();
+      if (!enabled) NarrationEngine.stop();
+    }
+
+    // Adjust controller grip bindings for height shifts
+    document.addEventListener('keydown', (e) => {
+      // Allow key shortcuts for comfort debugging
+      if (e.key === "h" || e.key === "H") {
+        toggleVRHeight();
+      }
+    });
+
+    function changeSpeechRate(value) {
+      appState.speechRate = parseFloat(value);
+      AudioEngine.playClick();
+      NarrationEngine.speak("Narration rate adjusted.");
+    }
+
+    function changeComfortMode(value) {
+      appState.comfortMode = value;
+      AudioEngine.playClick();
+      applyLocomotionPreferences();
+    }
+
+    function toggleSeatedMode(enabled) {
+      appState.seatedMode = enabled;
+      AudioEngine.playClick();
+      applySeatedCameraHeight();
+    }
+
+    function toggleHighContrast(enabled) {
+      appState.highContrast = enabled;
+      AudioEngine.playClick();
+
+      document.body.classList.toggle('high-contrast', enabled);
+
+      // Update A-Frame 3D HUD visuals for high contrast
+      const vrHudBg = document.getElementById('vrHudBg');
+      const vrHudTitle = document.getElementById('vrHudTitle');
+      const vrHudSubtitles = document.getElementById('vrHudSubtitles');
+
+      if (vrHudBg && vrHudTitle && vrHudSubtitles) {
+        if (enabled) {
+          vrHudBg.setAttribute('color', '#000000');
+          vrHudBg.setAttribute('material', 'strokeColor: #ffff00; strokeWidth: 4; opacity: 1.0; shader: flat');
+          vrHudTitle.setAttribute('color', '#ffff00');
+          vrHudSubtitles.setAttribute('color', '#ffff00');
+        } else {
+          vrHudBg.setAttribute('color', '#110e20');
+          vrHudBg.setAttribute('material', 'strokeColor: #783eff; strokeWidth: 2; opacity: 0.85; transparent: true');
+          vrHudTitle.setAttribute('color', '#00ffcc');
+          vrHudSubtitles.setAttribute('color', '#ffffff');
+        }
+      }
+    }
+
+    function toggleLargeText(enabled) {
+      appState.largeText = enabled;
+      AudioEngine.playClick();
+      document.body.classList.toggle('large-text', enabled);
+    }
+
+    function changeColorFilter(value) {
+      appState.colorFilter = value;
+      AudioEngine.playClick();
+
+      // Remove all filter classes
+      document.body.classList.remove('filter-grayscale', 'filter-deuteranopia', 'filter-protanopia', 'filter-tritanopia');
+
+      if (value !== 'none') {
+        document.body.classList.add(`filter-${value}`);
+      }
+    }
+
+    // Apply height changes inside WebXR
+    function applySeatedCameraHeight() {
+      const camera = document.getElementById('camera');
+      const heightText = document.getElementById('vrHudHeightBtnText');
+
+      if (appState.seatedMode) {
+        camera.setAttribute('position', '0 1.1 0');
+        if (heightText) heightText.setAttribute('value', 'Height: Seat');
+      } else {
+        camera.setAttribute('position', '0 1.6 0');
+        if (heightText) heightText.setAttribute('value', 'Height: Std');
+      }
+    }
+
+    // Apply controllers or gaze mode
+    function applyLocomotionPreferences() {
+      const gaze = document.getElementById('gazeCursor');
+      if (gaze) {
+        if (appState.comfortMode === "gaze") {
+          gaze.setAttribute('visible', 'true');
+          gaze.setAttribute('raycaster', 'objects: .clickable; far: 20');
+        } else {
+          gaze.setAttribute('visible', 'false');
+          gaze.setAttribute('raycaster', 'objects: none');
+        }
+      }
+    }
+
+    // VR snap turn action for comfort seated navigation
+    function snapTurn(angle) {
+      const rig = document.getElementById('cameraRig');
+      const rotation = rig.getAttribute('rotation');
+      rotation.y += angle;
+      rig.setAttribute('rotation', rotation);
+      AudioEngine.playTeleport();
+    }
+
+    // 3D HUD specific toggles
+    function toggleVRHeight() {
+      toggleSeatedMode(!appState.seatedMode);
+      // Sync checkbox
+      document.getElementById('settingSeated').checked = appState.seatedMode;
+    }
+
+    // VR Era Switcher for Pyramids
+    function toggleVREra() {
+      const nextEra = (appState.era === "modern") ? "ancient" : "modern";
+      setEra(nextEra);
+    }
+
+    // --- IMMERSIVE VR TOUR LIFE-CYCLE ---
+
+    function enterDestinationTour() {
+      closePanel('detailsPanel');
+      showLoader("Configuring destination coordinates...");
+
+      setTimeout(() => {
+        document.body.classList.add('in-tour');
+
+        // Force A-Frame viewport redraw
+        window.dispatchEvent(new Event('resize'));
+
+        // Select matching destination details
+        const dest = destinations.find(d => d.id === activeDetailId);
+        appState.currentDest = dest;
+
+        loadDestinationScene(dest);
+
+        // Audio & Text Introduction triggers
+        AudioEngine.playSuccess();
+        AudioEngine.startAmbientHum(dest.ambientFreq);
+
+        hideLoader();
+
+        // Auto-request entering WebXR if device supports it
+        const sceneEl = document.querySelector('a-scene');
+        if (sceneEl.sceneEl.isMobile || navigator.xr) {
+          // A-Frame automatically displays the Enter VR button at the bottom right.
+          // The user can tap it to project into Meta Quest 3S lenses.
+        }
+
+        // Narrate scene start
+        NarrationEngine.speak(`Entering ${dest.name}. ${dest.shortDesc}`);
+
+      }, 800);
+    }
+
+    function exitTour() {
+      showLoader("Returning to lobby...");
+      NarrationEngine.stop();
+      AudioEngine.stopAmbientHum();
+      AudioEngine.playClick();
+
+      setTimeout(() => {
+        document.body.classList.remove('in-tour');
+        appState.currentDest = null;
+
+        // Clean environment
+        clearProceduralEnvironment();
+
+        // Reset VR HUD elements
+        const hudTitle = document.getElementById('vrHudTitle');
+        const hudSub = document.getElementById('hudDestTitle');
+        const hudLoc = document.getElementById('hudDestLoc');
+
+        if (hudTitle) hudTitle.setAttribute('value', 'Selection Lobby');
+        if (hudSub) hudSub.textContent = 'Gateway Selection Lobby';
+        if (hudLoc) hudLoc.textContent = 'Lobby';
+
+        // Close A-Frame VR session if active
+        const sceneEl = document.querySelector('a-scene');
+        if (sceneEl.is('vr-mode')) {
+          sceneEl.exitVR();
+        }
+
+        hideLoader();
+      }, 600);
+    }
+
+    // --- PROCEDURAL 3D WORLD BUILDERS ---
+
+    function loadDestinationScene(dest) {
+      // 1. Update sky and environment lighting intensities
+      const sky = document.getElementById('sky');
+      sky.setAttribute('color', dest.skyColorModern);
+
+      const ambient = document.getElementById('ambientLight');
+      const directional = document.getElementById('directionalLight');
+      ambient.setAttribute('light', `type: ambient; color: #3d3460; intensity: ${dest.lightIntensity}`);
+
+      // Update titles
+      document.getElementById('hudDestTitle').textContent = dest.name;
+      document.getElementById('hudDestLoc').textContent = dest.location;
+
+      const vrHudTitle = document.getElementById('vrHudTitle');
+      if (vrHudTitle) vrHudTitle.setAttribute('value', dest.name);
+
+      // Clear past items
+      clearProceduralEnvironment();
+
+      // Show/Hide Era Switcher on HUD based on Pyramids historical toggle capability
+      const eraToggle = document.getElementById('eraTogglePill');
+      const vrHudEraBtn = document.getElementById('vrHudEraBtn');
+      appState.era = "modern"; // Reset
+
+      if (dest.id === "pyramids") {
+        eraToggle.style.display = "flex";
+        if (vrHudEraBtn) vrHudEraBtn.setAttribute('visible', 'true');
+        document.getElementById('eraModernBtn').classList.add('active');
+        document.getElementById('eraAncientBtn').classList.remove('active');
+      } else {
+        eraToggle.style.display = "none";
+        if (vrHudEraBtn) vrHudEraBtn.setAttribute('visible', 'false');
+      }
+
+      // Reset camera position to destination specific default spawn point
+      const rig = document.getElementById('cameraRig');
+      rig.setAttribute('position', dest.spawnPos);
+      rig.setAttribute('rotation', '0 0 0');
+
+      applySeatedCameraHeight();
+      applyLocomotionPreferences();
+
+      // 2. Build 3D environments procedurally
+      const container = document.getElementById('proceduralEnvironment');
+
+      if (dest.id === "pyramids") {
+        buildPyramidsScene(container, "modern");
+      } else if (dest.id === "mars") {
+        buildMarsScene(container);
+      } else if (dest.id === "fjord") {
+        buildNorwayScene(container);
+      } else if (dest.id === "oceanic") {
+        buildOceanicScene(container);
+      }
+
+      // 3. Render comfortable waypoints
+      buildWaypoints(dest.waypoints);
+
+      // 4. Render points of interest nodes
+      buildPois(dest.pois);
+    }
+
+    function clearProceduralEnvironment() {
+      document.getElementById('proceduralEnvironment').innerHTML = '';
+      document.getElementById('aframeHotspotsContainer').innerHTML = '';
+      document.getElementById('aframeWaypointsContainer').innerHTML = '';
+    }
+
+    // --- SCENE 1: EGYPT GIZA PYRAMIDS Restorations ---
+    function buildPyramidsScene(container, era) {
+      // Warm desert sand ground plane
+      const sand = document.createElement('a-plane');
+      sand.setAttribute('rotation', '-90 0 0');
+      sand.setAttribute('width', '300');
+      sand.setAttribute('height', '300');
+      sand.setAttribute('color', era === "modern" ? "#dcb36c" : "#ebd79f");
+      sand.setAttribute('roughness', '0.9');
+      container.appendChild(sand);
+
+      // Sun sphere
+      const sun = document.createElement('a-sphere');
+      sun.setAttribute('position', '0 12 -90');
+      sun.setAttribute('radius', '8');
+      sun.setAttribute('color', era === "modern" ? "#f39c12" : "#f1c40f");
+      sun.setAttribute('material', 'shader: flat');
+      container.appendChild(sun);
+
+      // Restored pyramids (using A-Frame cones with 4 radial segments)
+      const pyramidColors = {
+        modern: { body: "#be9a60" },
+        ancient: { body: "#f5f3f0", cap: "#ffd700" }
+      };
+
+      const pConfigs = [
+        { id: "pKhufu", radius: 45, height: 40, pos: "0 18 -45" },
+        { id: "pKhafre", radius: 36, height: 32, pos: "-35 15 -70" },
+        { id: "pMenkaure", radius: 20, height: 18, pos: "32 8 -30" }
+      ];
+
+      pConfigs.forEach(p => {
+        const entity = document.createElement('a-cone');
+        entity.setAttribute('id', p.id);
+        entity.setAttribute('position', p.pos);
+        entity.setAttribute('radius-bottom', p.radius);
+        entity.setAttribute('height', p.height);
+        entity.setAttribute('segments-radial', '4');
+        entity.setAttribute('color', pyramidColors[era].body);
+
+        if (era === "ancient") {
+          // Add solid golden capstones
+          const capHeight = p.height * 0.15;
+          const cap = document.createElement('a-cone');
+          cap.setAttribute('position', `0 ${(p.height / 2) - (capHeight / 2) + 0.05} 0`);
+          cap.setAttribute('radius-bottom', p.radius * 0.15);
+          cap.setAttribute('height', capHeight);
+          cap.setAttribute('segments-radial', '4');
+          cap.setAttribute('color', pyramidColors[era].cap);
+          cap.setAttribute('material', 'shader: flat');
+          entity.appendChild(cap);
+        }
+
+        container.appendChild(entity);
+      });
+
+      // Sphinx representation
+      const sphinxRig = document.createElement('a-entity');
+      sphinxRig.setAttribute('position', '15 0.5 -12');
+      sphinxRig.setAttribute('rotation', '0 -45 0');
+
+      // Body block
+      const sphinxBody = document.createElement('a-box');
+      sphinxBody.setAttribute('width', '5');
+      sphinxBody.setAttribute('height', '2.5');
+      sphinxBody.setAttribute('depth', '10');
+      sphinxBody.setAttribute('color', '#c09c64');
+      sphinxRig.appendChild(sphinxBody);
+
+      // Head cylinder
+      const sphinxHead = document.createElement('a-cylinder');
+      sphinxHead.setAttribute('position', '0 2.2 4');
+      sphinxHead.setAttribute('radius', '1.3');
+      sphinxHead.setAttribute('height', '2');
+      sphinxHead.setAttribute('color', '#c09c64');
+      sphinxRig.appendChild(sphinxHead);
+
+      container.appendChild(sphinxRig);
+
+      // Nile river plane (Only green and visible in ancient era)
+      if (era === "ancient") {
+        const nile = document.createElement('a-plane');
+        nile.setAttribute('position', '-22 0.02 -15');
+        nile.setAttribute('rotation', '-90 40 0');
+        nile.setAttribute('width', '30');
+        nile.setAttribute('height', '300');
+        nile.setAttribute('color', '#3498db');
+        nile.setAttribute('opacity', '0.75');
+        container.appendChild(nile);
+
+        // Lush green banks
+        const bankLeft = document.createElement('a-plane');
+        bankLeft.setAttribute('position', '-35 0.01 -15');
+        bankLeft.setAttribute('rotation', '-90 40 0');
+        bankLeft.setAttribute('width', '15');
+        bankLeft.setAttribute('height', '300');
+        bankLeft.setAttribute('color', '#2ecc71');
+        container.appendChild(bankLeft);
+      }
+    }
+
+    // --- SCENE 2: COSMIC OBSERVATORY ON MARS ---
+    function buildMarsScene(container) {
+      // Red Mars sands
+      const redSands = document.createElement('a-plane');
+      redSands.setAttribute('rotation', '-90 0 0');
+      redSands.setAttribute('width', '250');
+      redSands.setAttribute('height', '250');
+      redSands.setAttribute('color', '#ac4828');
+      redSands.setAttribute('roughness', '0.95');
+      container.appendChild(redSands);
+
+      // Distant crater hills
+      const hills = [
+        { pos: "-45 5 -60", scale: "30 15 30" },
+        { pos: "55 8 -75", scale: "45 18 45" },
+        { pos: "-20 3 -80", scale: "25 10 25" }
+      ];
+      hills.forEach(h => {
+        const hill = document.createElement('a-cylinder');
+        hill.setAttribute('position', h.pos);
+        hill.setAttribute('scale', h.scale);
+        hill.setAttribute('radius', '1');
+        hill.setAttribute('height', '1');
+        hill.setAttribute('color', '#8e3518');
+        hill.setAttribute('segments-radial', '8');
+        container.appendChild(hill);
+      });
+
+      // Stars in the background (Procedural white dots on Mars orbit dome)
+      for (let i = 0; i < 55; i++) {
+        const star = document.createElement('a-sphere');
+        const theta = Math.random() * Math.PI;
+        const phi = Math.random() * Math.PI * 2;
+        const dist = 55;
+
+        const x = dist * Math.sin(theta) * Math.cos(phi);
+        const y = Math.abs(dist * Math.cos(theta));
+        const z = dist * Math.sin(theta) * Math.sin(phi);
+
+        star.setAttribute('position', `${x} ${y} ${z}`);
+        star.setAttribute('radius', (Math.random() * 0.08 + 0.04));
+        star.setAttribute('color', '#ffffff');
+        star.setAttribute('material', 'shader: flat');
+        container.appendChild(star);
+      }
+
+      // Futuristic Glass Dome structure
+      const dome = document.createElement('a-sphere');
+      dome.setAttribute('radius', '12');
+      dome.setAttribute('material', 'color: #5bb3ff; opacity: 0.12; transparent: true; side: double; roughness: 0.1');
+      dome.setAttribute('phi-length', '180');
+      dome.setAttribute('theta-length', '90');
+      dome.setAttribute('position', '0 0 0');
+      dome.setAttribute('rotation', '90 0 0');
+      container.appendChild(dome);
+
+      // Glowing metallic support pillars
+      for (let angle = 0; angle < 360; angle += 60) {
+        const rad = angle * Math.PI / 180;
+        const r = 11.8;
+        const x = r * Math.cos(rad);
+        const z = r * Math.sin(rad);
+
+        const pillar = document.createElement('a-cylinder');
+        pillar.setAttribute('position', `${x} 4 ${z}`);
+        pillar.setAttribute('radius', '0.12');
+        pillar.setAttribute('height', '8');
+        pillar.setAttribute('color', '#1e1c2a');
+
+        // Cyan glowing rings on pillars
+        const ring = document.createElement('a-ring');
+        ring.setAttribute('position', '0 2 0');
+        ring.setAttribute('rotation', '90 0 0');
+        ring.setAttribute('radius-inner', '0.13');
+        ring.setAttribute('radius-outer', '0.16');
+        ring.setAttribute('color', '#00ffcc');
+        ring.setAttribute('material', 'shader: flat');
+        pillar.appendChild(ring);
+
+        container.appendChild(pillar);
+      }
+
+      // Interactive Holographic Solar System console
+      const solConsole = document.createElement('a-entity');
+      solConsole.setAttribute('position', '0 0.8 -3.2');
+
+      // Glass table
+      const stand = document.createElement('a-cylinder');
+      stand.setAttribute('radius', '0.8');
+      stand.setAttribute('height', '0.6');
+      stand.setAttribute('color', '#191530');
+      solConsole.appendChild(stand);
+
+      // Rotating Solar System planets
+      const model = document.createElement('a-entity');
+      model.setAttribute('position', '0 0.7 0');
+
+      // Sun
+      const sunModel = document.createElement('a-sphere');
+      sunModel.setAttribute('radius', '0.2');
+      sunModel.setAttribute('color', '#ffea6c');
+      sunModel.setAttribute('material', 'shader: flat');
+      model.appendChild(sunModel);
+
+      // Planets
+      const orbits = [
+        { r: 0.45, speed: 2000, color: "#8e8e8e", size: 0.03 },
+        { r: 0.65, speed: 4000, color: "#e67e22", size: 0.05 },
+        { r: 0.88, speed: 6000, color: "#3498db", size: 0.06 },
+        { r: 1.15, speed: 8500, color: "#e74c3c", size: 0.04 }
+      ];
+
+      orbits.forEach(o => {
+        const orbitRing = document.createElement('a-ring');
+        orbitRing.setAttribute('radius-inner', o.r - 0.005);
+        orbitRing.setAttribute('radius-outer', o.r + 0.005);
+        orbitRing.setAttribute('color', '#2d3748');
+        orbitRing.setAttribute('rotation', '90 0 0');
+        model.appendChild(orbitRing);
+
+        const planetRig = document.createElement('a-entity');
+        planetRig.setAttribute('animation', `property: rotation; to: 0 360 0; loop: true; dur: ${o.speed}; easing: linear`);
+
+        const planet = document.createElement('a-sphere');
+        planet.setAttribute('position', `${o.r} 0 0`);
+        planet.setAttribute('radius', o.size);
+        planet.setAttribute('color', o.color);
+        planet.setAttribute('material', 'shader: flat');
+        planetRig.appendChild(planet);
+
+        model.appendChild(planetRig);
+      });
+
+      solConsole.appendChild(model);
+      container.appendChild(solConsole);
+
+      // Curiosity Rover (Simplistic model outside)
+      const rover = document.createElement('a-entity');
+      rover.setAttribute('position', '-8 0.4 -9');
+
+      const body = document.createElement('a-box');
+      body.setAttribute('width', '1.6');
+      body.setAttribute('height', '0.8');
+      body.setAttribute('depth', '2');
+      body.setAttribute('color', '#7f8c8d');
+      rover.appendChild(body);
+
+      const mast = document.createElement('a-cylinder');
+      mast.setAttribute('position', '0 1 0.6');
+      mast.setAttribute('radius', '0.08');
+      mast.setAttribute('height', '1.2');
+      mast.setAttribute('color', '#95a5a6');
+
+      const cam = document.createElement('a-box');
+      cam.setAttribute('position', '0 0.6 0');
+      cam.setAttribute('width', '0.4');
+      cam.setAttribute('height', '0.2');
+      cam.setAttribute('depth', '0.2');
+      cam.setAttribute('color', '#2c3e50');
+      mast.appendChild(cam);
+      body.appendChild(mast);
+
+      container.appendChild(rover);
+    }
+
+    // --- SCENE 3: NORWAY NORTHERN LIGHTS FJORD ---
+    function buildNorwayScene(container) {
+      // Snowy landscape
+      const snow = document.createElement('a-plane');
+      snow.setAttribute('rotation', '-90 0 0');
+      snow.setAttribute('width', '250');
+      snow.setAttribute('height', '250');
+      snow.setAttribute('color', '#ecf0f1');
+      snow.setAttribute('roughness', '0.85');
+      container.appendChild(snow);
+
+      // Fjord Water Plane in Center
+      const fjord = document.createElement('a-plane');
+      fjord.setAttribute('position', '0 0.05 -50');
+      fjord.setAttribute('rotation', '-90 0 0');
+      fjord.setAttribute('width', '14');
+      fjord.setAttribute('height', '150');
+      fjord.setAttribute('color', '#041724');
+      fjord.setAttribute('opacity', '0.9');
+      fjord.setAttribute('roughness', '0.1');
+      container.appendChild(fjord);
+
+      // High Snowy Mountain Peaks on the sides
+      const peaks = [
+        { x: -35, z: -35, r: 25, h: 42 },
+        { x: 35, z: -40, r: 25, h: 45 },
+        { x: -45, z: -70, r: 35, h: 58 },
+        { x: 45, z: -80, r: 35, h: 60 }
+      ];
+
+      peaks.forEach(p => {
+        const peak = document.createElement('a-cone');
+        peak.setAttribute('position', `${p.x} ${(p.h / 2) - 1} ${p.z}`);
+        peak.setAttribute('radius-bottom', p.r);
+        peak.setAttribute('height', p.h);
+        peak.setAttribute('color', '#5c6475');
+
+        // Snow caps stacked
+        const cap = document.createElement('a-cone');
+        cap.setAttribute('position', `0 ${(p.h / 4)} 0`);
+        cap.setAttribute('radius-bottom', p.r / 2);
+        cap.setAttribute('height', p.h / 2);
+        cap.setAttribute('color', '#ffffff');
+        peak.appendChild(cap);
+
+        container.appendChild(peak);
+      });
+
+      // Aurora Borealis curtains (Using curved translucent green/violet planes)
+      const ribbons = [
+        { col: "#00ff66", rad: 55, h: 18, rot: "0 0 5", pos: "0 22 -35", delay: 0 },
+        { col: "#9b59b6", rad: 65, h: 12, rot: "0 45 -4", pos: "-12 26 -55", delay: 2000 }
+      ];
+
+      ribbons.forEach(r => {
+        const ribbon = document.createElement('a-curvedimage');
+        ribbon.setAttribute('position', r.pos);
+        ribbon.setAttribute('radius', r.rad);
+        ribbon.setAttribute('height', r.h);
+        ribbon.setAttribute('theta-length', '90');
+        ribbon.setAttribute('rotation', r.rot);
+        ribbon.setAttribute('material', `color: ${r.col}; opacity: 0.3; shader: flat; transparent: true; side: double`);
+
+        // Aurora Sway Animation
+        ribbon.setAttribute('animation__sway', `property: rotation; to: 0 360 0; loop: true; dur: 80000; easing: linear`);
+
+        container.appendChild(ribbon);
+      });
+    }
+
+    // --- SCENE 4: DEEP OCEAN BIOSPHERE ---
+    function buildOceanicScene(container) {
+      // Seafloor sand
+      const seabed = document.createElement('a-plane');
+      seabed.setAttribute('rotation', '-90 0 0');
+      seabed.setAttribute('width', '250');
+      seabed.setAttribute('height', '250');
+      seabed.setAttribute('color', '#122538');
+      seabed.setAttribute('roughness', '0.98');
+      container.appendChild(seabed);
+
+      // Fog activation for underwater look (directly on scene)
+      const scene = document.querySelector('a-scene');
+      scene.setAttribute('fog', 'type: exponential; color: #010814; density: 0.05');
+
+      // Biosphere Glass Dome
+      const dome = document.createElement('a-sphere');
+      dome.setAttribute('radius', '8');
+      dome.setAttribute('material', 'color: #3bb8ff; opacity: 0.15; transparent: true; side: double');
+      dome.setAttribute('phi-length', '180');
+      dome.setAttribute('theta-length', '90');
+      dome.setAttribute('position', '0 0 0');
+      dome.setAttribute('rotation', '90 0 0');
+      container.appendChild(dome);
+
+      // Support rings inside dome
+      const baseRing = document.createElement('a-ring');
+      baseRing.setAttribute('position', '0 0.05 0');
+      baseRing.setAttribute('rotation', '90 0 0');
+      baseRing.setAttribute('radius-inner', '7.8');
+      baseRing.setAttribute('radius-outer', '8');
+      baseRing.setAttribute('color', '#1c2d42');
+      container.appendChild(baseRing);
+
+      // Hydrothermal vent (Volcano) outside dome
+      const vent = document.createElement('a-cylinder');
+      vent.setAttribute('position', '10 2.5 -12');
+      vent.setAttribute('radius', '1.1');
+      vent.setAttribute('height', '5');
+      vent.setAttribute('color', '#2c3e50');
+
+      // Glowing lava top
+      const lava = document.createElement('a-cylinder');
+      lava.setAttribute('position', '0 2.51 0');
+      lava.setAttribute('radius', '0.9');
+      vent.setAttribute('height', '0.1');
+      lava.setAttribute('color', '#ff5500');
+      lava.setAttribute('material', 'shader: flat');
+      vent.appendChild(lava);
+      container.appendChild(vent);
+
+      // Swaying Bioluminescent Kelp plants (Procedural blocks)
+      for (let k = 0; k < 6; k++) {
+        const x = (Math.random() * 8 + 4) * (Math.random() > 0.5 ? 1 : -1);
+        const z = -(Math.random() * 8 + 6);
+
+        const kelpRig = document.createElement('a-entity');
+        kelpRig.setAttribute('position', `${x} 0 ${z}`);
+        kelpRig.setAttribute('animation', `property: rotation; to: 5 0 3; dir: alternate; dur: ${3000 + k * 500}; loop: true; easing: easeInOutSine`);
+
+        // Stacked green glowing beads for kelp
+        let h = 0;
+        for (let b = 0; b < 6; b++) {
+          const bead = document.createElement('a-sphere');
+          bead.setAttribute('position', `0 ${h} 0`);
+          bead.setAttribute('radius', (0.35 - b * 0.03));
+          bead.setAttribute('color', '#00ffcc');
+          bead.setAttribute('material', 'shader: flat; opacity: 0.8');
+          kelpRig.appendChild(bead);
+          h += 0.6;
+        }
+        container.appendChild(kelpRig);
+      }
+
+      // Rising Bubble effects
+      for (let bb = 0; bb < 12; bb++) {
+        const bx = (Math.random() * 16 - 8);
+        const bz = -(Math.random() * 16 - 8);
+
+        const bubble = document.createElement('a-sphere');
+        bubble.setAttribute('position', `${bx} ${Math.random() * 6} ${bz}`);
+        bubble.setAttribute('radius', '0.04');
+        bubble.setAttribute('color', '#ffffff');
+        bubble.setAttribute('material', 'opacity: 0.3; transparent: true');
+        bubble.setAttribute('animation__up', `property: position; to: ${bx} 12 ${bz}; loop: true; dur: ${6000 + bb * 800}; easing: linear`);
+        container.appendChild(bubble);
+      }
+    }
+
+    // --- PROCEDURAL WAYPOINT LOCATIONS ---
+    function buildWaypoints(list) {
+      const container = document.getElementById('aframeWaypointsContainer');
+
+      list.forEach((wp, index) => {
+        const ring = document.createElement('a-ring');
+        ring.className = 'clickable waypoint-ring';
+        ring.setAttribute('position', `${wp.pos}`);
+        ring.setAttribute('rotation', '-90 0 0');
+        ring.setAttribute('radius-inner', '0.4');
+        ring.setAttribute('radius-outer', '0.5');
+        ring.setAttribute('color', '#00ffcc');
+        ring.setAttribute('material', 'shader: flat; opacity: 0.8');
+
+        // Add dynamic ring pulse scale
+        ring.setAttribute('pulse', 'speed: 1000; min: 0.9; max: 1.1');
+        ring.setAttribute('vr-interactive', '');
+
+        // Custom attribute for coordinates click navigation
+        ring.setAttribute('onclick', `teleportToWaypoint('${wp.pos}')`);
+
+        container.appendChild(ring);
+      });
+    }
+
+    function teleportToWaypoint(pos) {
+      const rig = document.getElementById('cameraRig');
+
+      // Preserve altitude adjustments from seated comfort settings
+      const coords = pos.split(' ');
+      rig.setAttribute('position', `${coords[0]} ${coords[1]} ${coords[2]}`);
+
+      AudioEngine.playTeleport();
+
+      // Dispatch alert confirmation
+      const dest = appState.currentDest;
+      NarrationEngine.speak("Moved to next checkpoint.", "Navigation");
+    }
+
+    // --- PROCEDURAL POINTS OF INTEREST (POIs) NODES ---
+    function buildPois(pois) {
+      const container = document.getElementById('aframeHotspotsContainer');
+
+      pois.forEach(poi => {
+        const poiEntity = document.createElement('a-entity');
+        poiEntity.setAttribute('position', poi.pos);
+
+        // POI Marker Ball
+        const ball = document.createElement('a-sphere');
+        ball.className = 'clickable';
+        ball.setAttribute('radius', '0.22');
+        ball.setAttribute('color', '#783eff');
+        ball.setAttribute('material', 'shader: flat');
+        ball.setAttribute('pulse', 'speed: 800; min: 0.85; max: 1.15');
+        ball.setAttribute('vr-interactive', '');
+        ball.setAttribute('onclick', `selectPoi('${poi.id}')`);
+        poiEntity.appendChild(ball);
+
+        // Icon text mapping on top of ball
+        const label = document.createElement('a-text');
+        label.setAttribute('value', '?');
+        label.setAttribute('align', 'center');
+        label.setAttribute('color', '#ffffff');
+        label.setAttribute('width', '2.5');
+        label.setAttribute('position', '0 0.3 0');
+        label.setAttribute('billboard', '');
+        poiEntity.appendChild(label);
+
+        container.appendChild(poiEntity);
+      });
+    }
+
+    function selectPoi(poiId) {
+      const dest = appState.currentDest;
+      if (!dest) return;
+      const poi = dest.pois.find(p => p.id === poiId);
+
+      AudioEngine.playPoi();
+
+      // Play speech read out and update subtitles HUD
+      NarrationEngine.speak(poi.description, poi.name);
+    }
+
+    // --- ERA TIME SWITCHER IMPLEMENTATION ---
+    function setEra(era) {
+      if (appState.era === era) return;
+
+      AudioEngine.playClick();
+      showLoader("Tuning virtual timeline matrix...");
+
+      setTimeout(() => {
+        appState.era = era;
+
+        // Sync 2D HUD toggle styles
+        document.getElementById('eraModernBtn').classList.toggle('active', era === 'modern');
+        document.getElementById('eraAncientBtn').classList.toggle('active', era === 'ancient');
+
+        // Sync 3D VR HUD text
+        const vrHudEraBtnText = document.getElementById('vrHudEraBtnText');
+        if (vrHudEraBtnText) {
+          vrHudEraBtnText.setAttribute('value', `Era: ${era.toUpperCase()}`);
+        }
+
+        // Rebuild environment layers specifically
+        const container = document.getElementById('proceduralEnvironment');
+        const dest = appState.currentDest;
+
+        clearProceduralEnvironment();
+
+        if (dest.id === "pyramids") {
+          buildPyramidsScene(container, era);
+          const sky = document.getElementById('sky');
+          sky.setAttribute('color', era === "modern" ? dest.skyColorModern : dest.skyColorAncient);
+        }
+
+        // Rebuild static nodes
+        buildWaypoints(dest.waypoints);
+        buildPois(dest.pois);
+
+        hideLoader();
+
+        // TTS update narration
+        NarrationEngine.speak(`Timeline shifted to the ${era} era.`, "Timeline");
+      }, 500);
+    }
+
+    // --- GENERIC SPINNER LOAD OVERLAY ---
+    function showLoader(message = "Processing...") {
+      const loader = document.getElementById('loadingScreen');
+      const text = document.getElementById('loadingText');
+      if (text) text.textContent = message;
+      if (loader) loader.classList.add('active');
+    }
+
+    function hideLoader() {
+      const loader = document.getElementById('loadingScreen');
+      if (loader) loader.classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
